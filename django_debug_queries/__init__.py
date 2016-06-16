@@ -6,6 +6,12 @@ import re
 from django.conf import settings
 from django.db import connection, reset_queries
 
+try:
+    import sqlparse
+    SQLPARSE_AVAILABLE = True
+except ImportError:
+    SQLPARSE_AVAILABLE = False
+
 def indent(s, n=2):
     spaces = ' ' * n
     return re.sub(r'(?ms)^', spaces, s)
@@ -26,12 +32,11 @@ def show_queries(db_alias=None):
             query_time = q['time']
             query_sql = q['sql']
             print("  Query {i} (taking {t}): ".format(i=i, t=query_time))
-            try:
-                import sqlparse
+            if SQLPARSE_AVAILABLE:
                 formatted = sqlparse.format(
                     query_sql, reindent=True, keyword_case='upper')
                 print(indent(formatted, 4))
-            except ImportError:
+            else:
                 print(indent(query_sql, 4))
     finally:
         settings.DEBUG = old_debug_setting
