@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import re
 
 from django.conf import settings
-from django.db import connection, reset_queries
+from django.db import connection, connections, reset_queries
 
 try:
     import sqlparse
@@ -18,13 +18,17 @@ def indent(s, n=2):
 
 @contextmanager
 def show_queries(db_alias=None):
+    if db_alias is None:
+        queries = connection.queries
+    else:
+        queries = connections[db_alias].queries
     old_debug_setting = settings.DEBUG
     try:
         settings.DEBUG = True
         reset_queries()
-        number_of_queries_before = len(connection.queries)
+        number_of_queries_before = len(queries)
         yield
-        queries_after = connection.queries[number_of_queries_before:]
+        queries_after = queries[number_of_queries_before:]
         number_of_queries = len(queries_after) - number_of_queries_before
         print("--===--")
         print("Number of queries: {n}".format(n=number_of_queries))
