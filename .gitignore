@@ -1,2 +1,4 @@
 *~
 __pycache__
+/dist
+/django_debug_queries.egg-info
