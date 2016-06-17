@@ -37,13 +37,12 @@ def show_queries(db_alias=None, sqlparse_character_limit=2048):
         # log from just getting bigger and bigger if this context
         # manager is used repeatedly.
         reset_queries()
-        number_of_queries_before = len(get_queries(db_alias))
         yield
-        queries_after = get_queries(db_alias)[number_of_queries_before:]
-        number_of_queries = len(queries_after) - number_of_queries_before
+        queries_after = get_queries(db_alias)[:]
+        number_of_queries = len(queries_after)
         print("--===--")
         print("Number of queries: {n}".format(n=number_of_queries))
-        for i, q in enumerate(queries_after[number_of_queries_before:]):
+        for i, q in enumerate(queries_after):
             query_time = q['time']
             query_sql = q['sql']
             query_length = len(query_sql)
