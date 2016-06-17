@@ -25,6 +25,10 @@ def show_queries(db_alias=None, sqlparse_character_limit=2048):
     old_debug_setting = settings.DEBUG
     try:
         settings.DEBUG = True
+        # This call to reset_queries ensures that the query list is
+        # empty before running the wrapped code, and stops the query
+        # log from just getting bigger and bigger if this context
+        # manager is used repeatedly.
         reset_queries()
         number_of_queries_before = len(queries)
         yield
