@@ -8,7 +8,6 @@ setup(
     description = "A context manager for printing Django SQL queries to the terminal",
     license = "MIT",
     keywords = "django debugging sql debug queries",
-    data_files = [("", ["LICENSE.txt"])],
     install_requires = [
         'Django',
     ]
