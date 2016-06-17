@@ -47,5 +47,6 @@ def show_queries(db_alias=None, sqlparse_character_limit=2048):
                 print(indent(formatted, 4))
             else:
                 print(indent(query_sql, 4))
+        print("End of query output.")
     finally:
         settings.DEBUG = old_debug_setting
