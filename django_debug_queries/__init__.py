@@ -17,7 +17,7 @@ def indent(s, n=2):
     return re.sub(r'(?ms)^', spaces, s)
 
 @contextmanager
-def show_queries(db_alias=None):
+def show_queries(db_alias=None, sqlparse_character_limit=2048):
     if db_alias is None:
         queries = connection.queries
     else:
@@ -35,8 +35,13 @@ def show_queries(db_alias=None):
         for i, q in enumerate(queries_after[number_of_queries_before:]):
             query_time = q['time']
             query_sql = q['sql']
+            query_length = len(query_sql)
             print("  Query {i} (taking {t}): ".format(i=i, t=query_time))
-            if SQLPARSE_AVAILABLE:
+            # Outputting the formatted query takes a very long time
+            # for large queries (e.g. those that prefetch_related can
+            # generate with "IN (... thousands of IDs ...)"), so only
+            # pretty-print queries that are fairly short.
+            if SQLPARSE_AVAILABLE and query_length <= sqlparse_character_limit:
                 formatted = sqlparse.format(
                     query_sql, reindent=True, keyword_case='upper')
                 print(indent(formatted, 4))
