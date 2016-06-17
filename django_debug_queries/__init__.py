@@ -16,12 +16,19 @@ def indent(s, n=2):
     spaces = ' ' * n
     return re.sub(r'(?ms)^', spaces, s)
 
+# The connection.queries property takes the queries_log and converts
+# it to a list before returning.  This means that you can't just keep
+# a reference to the queries property and check it before and after;
+# you need to access the property anew each time.  Using this function
+# each time will get an up-to-date query list.
+def get_queries(db_alias=None):
+    if db_alias is None:
+        return connection.queries
+    else:
+        return connections[db_alias].queries
+
 @contextmanager
 def show_queries(db_alias=None, sqlparse_character_limit=2048):
-    if db_alias is None:
-        queries = connection.queries
-    else:
-        queries = connections[db_alias].queries
     old_debug_setting = settings.DEBUG
     try:
         settings.DEBUG = True
@@ -30,9 +37,9 @@ def show_queries(db_alias=None, sqlparse_character_limit=2048):
         # log from just getting bigger and bigger if this context
         # manager is used repeatedly.
         reset_queries()
-        number_of_queries_before = len(queries)
+        number_of_queries_before = len(get_queries(db_alias))
         yield
-        queries_after = queries[number_of_queries_before:]
+        queries_after = get_queries(db_alias)[number_of_queries_before:]
         number_of_queries = len(queries_after) - number_of_queries_before
         print("--===--")
         print("Number of queries: {n}".format(n=number_of_queries))
