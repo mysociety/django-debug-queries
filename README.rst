@@ -8,6 +8,11 @@ track down the queries that are used in a management command or some
 other context than making requests in your browser; the ``show_queries``
 context manager in this package helps in those other situations.)
 
+.. warning:: Please be aware that DEBUG will be set to True
+             throughout the block (and restored to its previous
+             value afterwards), so this shouldn't be used in
+             production, for example.
+
 If you have sqlparse installed, then the SQL will be pretty-printed to
 make them easier to read, so I'd recommend that you also do:
 
@@ -78,4 +83,3 @@ parameter, e.g.
 
         with show_queries(db_alias='my_other_db'):
             ...
-
